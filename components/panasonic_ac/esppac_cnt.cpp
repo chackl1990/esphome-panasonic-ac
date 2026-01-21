@@ -248,27 +248,30 @@ void PanasonicACCNT::control(const climate::ClimateCall &call) {
   if (call.has_custom_fan_mode()) {
     ESP_LOGV(TAG, "Requested fan mode change");
 
-    if (strcmp(this->get_custom_preset(), "Normal") != 0) {
+    if (this->get_custom_preset() != "Normal") {
       ESP_LOGV(TAG, "Resetting preset");
       this->cmd[5] = (this->cmd[5] & 0xF0);  // Clear right nib for normal mode
     }
 
-    const char *fanMode = call.get_custom_fan_mode();
+    auto fanMode = call.get_custom_fan_mode();  // StringRef
 
-    if (strcmp(fanMode, "Automatic") == 0)
-      this->cmd[3] = 0xA0;
-    else if (strcmp(fanMode, "1") == 0)
-      this->cmd[3] = 0x30;
-    else if (strcmp(fanMode, "2") == 0)
-      this->cmd[3] = 0x40;
-    else if (strcmp(fanMode, "3") == 0)
-      this->cmd[3] = 0x50;
-    else if (strcmp(fanMode, "4") == 0)
-      this->cmd[3] = 0x60;
-    else if (strcmp(fanMode, "5") == 0)
-      this->cmd[3] = 0x70;
-    else
-      ESP_LOGV(TAG, "Unsupported fan mode requested");
+    
+    if (!fanMode.empty()) {
+      if (fanMode == "Automatic")
+        this->cmd[3] = 0xA0;
+      else if (fanMode == "1")
+        this->cmd[3] = 0x30;
+      else if (fanMode == "2")
+        this->cmd[3] = 0x40;
+      else if (fanMode == "3")
+        this->cmd[3] = 0x50;
+      else if (fanMode == "4")
+        this->cmd[3] = 0x60;
+      else if (fanMode == "5")
+        this->cmd[3] = 0x70;
+      else
+        ESP_LOGV(TAG, "Unsupported fan mode requested");
+    }
   }
 
   if (call.get_swing_mode().has_value()) {
@@ -296,16 +299,18 @@ void PanasonicACCNT::control(const climate::ClimateCall &call) {
   if (call.has_custom_preset()) {
     ESP_LOGV(TAG, "Requested preset change");
 
-    const char *preset = call.get_custom_preset();
+    auto preset = call.get_custom_preset();  // StringRef
 
-    if (strcmp(preset, "Normal") == 0)
-      this->cmd[5] = (this->cmd[5] & 0xF0);  // Clear right nib for normal mode
-    else if (strcmp(preset, "Powerful") == 0)
-      this->cmd[5] = (this->cmd[5] & 0xF0) + 0x02;  // Clear right nib and set powerful mode
-    else if (strcmp(preset, "Quiet") == 0)
-      this->cmd[5] = (this->cmd[5] & 0xF0) + 0x04;  // Clear right nib and set quiet mode
-    else
-      ESP_LOGV(TAG, "Unsupported preset requested");
+    if (!preset.empty()) {
+      if (preset == "Normal")
+        this->cmd[5] = (this->cmd[5] & 0xF0);  // Clear right nib for normal mode
+      else if (preset == "Powerful")
+        this->cmd[5] = (this->cmd[5] & 0xF0) + 0x02;  // Clear right nib and set powerful mode
+      else if (preset == "Quiet")
+        this->cmd[5] = (this->cmd[5] & 0xF0) + 0x04;  // Clear right nib and set quiet mode
+      else
+        ESP_LOGV(TAG, "Unsupported preset requested");
+    }
   }
 }
 

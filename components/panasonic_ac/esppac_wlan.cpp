@@ -110,28 +110,30 @@ void PanasonicACWLAN::control(const climate::ClimateCall &call) {
   if (call.has_custom_fan_mode()) {
     ESP_LOGV(TAG, "Requested fan mode change");
 
-    const char *fanMode = call.get_custom_fan_mode();
+    auto fanMode = call.get_custom_fan_mode();  // StringRef
 
-    if (strcmp(fanMode, "Automatic") == 0) {
-      set_value(0xB2, 0x41);
-      set_value(0xA0, 0x41);
-    } else if (strcmp(fanMode, "1") == 0) {
-      set_value(0xB2, 0x41);
-      set_value(0xA0, 0x32);
-    } else if (strcmp(fanMode, "2") == 0) {
-      set_value(0xB2, 0x41);
-      set_value(0xA0, 0x33);
-    } else if (strcmp(fanMode, "3") == 0) {
-      set_value(0xB2, 0x41);
-      set_value(0xA0, 0x34);
-    } else if (strcmp(fanMode, "4") == 0) {
-      set_value(0xB2, 0x41);
-      set_value(0xA0, 0x35);
-    } else if (strcmp(fanMode, "5") == 0) {
-      set_value(0xB2, 0x41);
-      set_value(0xA0, 0x36);
-    } else
-      ESP_LOGV(TAG, "Unsupported fan mode requested");
+    if (!fanMode.empty()) {
+      if (fanMode == "Automatic") {
+        set_value(0xB2, 0x41);
+        set_value(0xA0, 0x41);
+      } else if (fanMode == "1") {
+        set_value(0xB2, 0x41);
+        set_value(0xA0, 0x32);
+      } else if (fanMode == "2") {
+        set_value(0xB2, 0x41);
+        set_value(0xA0, 0x33);
+      } else if (fanMode == "3") {
+        set_value(0xB2, 0x41);
+        set_value(0xA0, 0x34);
+      } else if (fanMode == "4") {
+        set_value(0xB2, 0x41);
+        set_value(0xA0, 0x35);
+      } else if (fanMode == "5") {
+        set_value(0xB2, 0x41);
+        set_value(0xA0, 0x36);
+      } else
+        ESP_LOGV(TAG, "Unsupported fan mode requested");
+    }
   }
 
   if (call.get_swing_mode().has_value()) {
@@ -164,22 +166,24 @@ void PanasonicACWLAN::control(const climate::ClimateCall &call) {
   if (call.has_custom_preset()) {
     ESP_LOGV(TAG, "Requested preset change");
 
-    const char *preset = call.get_custom_preset();
+    auto preset = call.get_custom_preset();  // StringRef
 
-    if (strcmp(preset, "Normal") == 0) {
-      set_value(0xB2, 0x41);
-      set_value(0x35, 0x42);
-      set_value(0x34, 0x42);
-    } else if (strcmp(preset, "Powerful") == 0) {
-      set_value(0xB2, 0x42);
-      set_value(0x35, 0x42);
-      set_value(0x34, 0x42);
-    } else if (strcmp(preset, "Quiet") == 0) {
-      set_value(0xB2, 0x43);
-      set_value(0x35, 0x42);
-      set_value(0x34, 0x42);
-    } else
-      ESP_LOGV(TAG, "Unsupported preset requested");
+    if (!preset.empty()) {
+      if (preset == "Normal") {
+        set_value(0xB2, 0x41);
+        set_value(0x35, 0x42);
+        set_value(0x34, 0x42);
+      } else if (preset == "Powerful") {
+        set_value(0xB2, 0x42);
+        set_value(0x35, 0x42);
+        set_value(0x34, 0x42);
+      } else if (preset == "Quiet") {
+        set_value(0xB2, 0x43);
+        set_value(0x35, 0x42);
+        set_value(0x34, 0x42);
+      } else
+        ESP_LOGV(TAG, "Unsupported preset requested");
+    }
   }
 
   if (this->set_queue_index_ > 0)  // Only send packet if any changes need to be made
